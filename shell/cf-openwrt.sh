@@ -77,7 +77,7 @@ do
 		count=m/30+1
 		for i in `cat anycast.txt`
 		do
-			ping -c $count -i 0.2 -n -q $i > icmp/$n.log&
+			ping -c $count -i 1 -n -q $i > icmp/$n.log&
 			n=$[$n+1]
 			per=$n*100/$m
 			while true
@@ -86,7 +86,7 @@ do
 				if [ $p -ge 200 ]
 				then
 					echo 正在测试 ICMP 丢包率:进程数 $p,已完成 $per %
-					sleep 0.5
+					sleep 1
 				else
 					echo 正在测试 ICMP 丢包率:进程数 $p,已完成 $per %
 					break
@@ -106,7 +106,7 @@ do
 				break
 			fi
 		done
-		cat icmp/*.log | sed -n '3~5p;4~5p' | sed -n '{N;s/\n/\t/p}' | cut -f 1 -d'%' | awk '{print $2,$NF}' | sort -k 2 -n | awk '{print $1}' | sed '31,$d' > ip.txt
+		cat icmp/*.log | grep 'statistics\|loss' | sed -n '{N;s/\n/\t/p}' | cut -f 1 -d'%' | awk '{print $NF,$2}' | sort -n | awk '{print $2}' | sed '31,$d' > ip.txt
 		rm -rf icmp
 		echo 选取30个丢包率最少的IP地址下载测速
 		mkdir temp
